@@ -1,0 +1,31 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: dockerfile.dev
+
+    container_name: biblioteca-app
+
+    ports:
+      - 8080:8080
+
+    environment:
+      - UV_NO_DEV=0
+
+    volumes:
+      - .:/app
+
+  database:
+    image: postgres:18-alpine3.22
+    shm_size: 128mb
+    restart: always
+
+    environment:
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=biblioteca
+
+    volumes:
+      - postgres_data:/var/lib/postgresql
+
+volumes:
+  postgres_data:
