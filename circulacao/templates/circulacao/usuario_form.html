@@ -1,0 +1,70 @@
+{% extends 'circulacao/base.html' %}
+
+{% block title %}{% if object %}Editar Leitor{% else %}Novo Leitor{% endif %} - Biblioteca{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title">
+        <h1>{% if object %}Editar Leitor: {{ object.username }}{% else %}Novo Leitor{% endif %}</h1>
+        <p>Preencha as informações do leitor abaixo.</p>
+    </div>
+    <a href="{% url 'usuario_list' %}" class="btn btn-secondary">
+        <i class="fa-solid fa-arrow-left"></i> Voltar
+    </a>
+</div>
+
+<div class="card" style="max-width: 600px; margin: 0 auto;">
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="id_username">Nome de Usuário (Username)</label>
+            {{ form.username }}
+            {% if form.username.errors %}
+                <span class="helptext" style="color: var(--danger);">{{ form.username.errors }}</span>
+            {% endif %}
+        </div>
+
+        <div class="grid-2">
+            <div class="form-group">
+                <label for="id_first_name">Primeiro Nome</label>
+                {{ form.first_name }}
+                {% if form.first_name.errors %}
+                    <span class="helptext" style="color: var(--danger);">{{ form.first_name.errors }}</span>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <label for="id_last_name">Sobrenome</label>
+                {{ form.last_name }}
+                {% if form.last_name.errors %}
+                    <span class="helptext" style="color: var(--danger);">{{ form.last_name.errors }}</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="id_email">E-mail</label>
+            {{ form.email }}
+            {% if form.email.errors %}
+                <span class="helptext" style="color: var(--danger);">{{ form.email.errors }}</span>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="id_password">Senha</label>
+            {{ form.password }}
+            {% if form.password.errors %}
+                <span class="helptext" style="color: var(--danger);">{{ form.password.errors }}</span>
+            {% endif %}
+            <span class="helptext">{{ form.password.help_text }}</span>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 2rem;">
+            <a href="{% url 'usuario_list' %}" class="btn btn-secondary">Cancelar</a>
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-user-check"></i> Salvar Leitor
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

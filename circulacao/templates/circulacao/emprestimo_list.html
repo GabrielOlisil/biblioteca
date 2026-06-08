@@ -1,0 +1,89 @@
+{% extends 'circulacao/base.html' %}
+
+{% block title %}Empréstimos - Biblioteca{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title">
+        <h1>Empréstimos</h1>
+        <p>Gerencie a retirada e devolução de livros do acervo.</p>
+    </div>
+    <div style="display: flex; gap: 0.75rem;">
+        <a href="{% url 'relatorio_atrasados' %}" class="btn btn-secondary" style="border: 1px solid var(--primary); color: var(--primary);">
+            <i class="fa-solid fa-file-pdf"></i> Gerar PDF de Atrasados
+        </a>
+        <a href="{% url 'emprestimo_create' %}" class="btn btn-primary">
+            <i class="fa-solid fa-plus"></i> Novo Empréstimo
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Livro</th>
+                    <th>Leitor</th>
+                    <th>Data Retirada</th>
+                    <th>Devolução Prevista</th>
+                    <th>Data Retorno</th>
+                    <th>Status / Multa</th>
+                    <th style="width: 140px; text-align: right;">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for emp in emprestimos %}
+                    <tr>
+                        <td><strong>{{ emp.livro.titulo }}</strong></td>
+                        <td>{{ emp.usuario.username }}</td>
+                        <td>{{ emp.data_emprestimo|date:"d/m/Y" }}</td>
+                        <td>{{ emp.data_devolucao_prevista|date:"d/m/Y" }}</td>
+                        <td>
+                            {% if emp.data_devolucao_real %}
+                                {{ emp.data_devolucao_real|date:"d/m/Y" }}
+                            {% else %}
+                                <span style="color: var(--text-muted); font-style: italic;">Pendente</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if emp.data_devolucao_real %}
+                                <span class="badge badge-success">Entregue</span>
+                                {% if emp.valor_multa > 0 %}
+                                    <span class="badge badge-danger" style="margin-left: 5px;">R$ {{ emp.valor_multa }}</span>
+                                {% endif %}
+                            {% else %}
+                                <!-- Verificar se está atrasado -->
+                                {% if emp.data_devolucao_prevista < today %}
+                                    <span class="badge badge-danger">Atrasado</span>
+                                {% else %}
+                                    <span class="badge badge-warning">Em Dia</span>
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                        <td style="text-align: right;">
+                            {% if not emp.data_devolucao_real %}
+                                <form action="{% url 'emprestimo_return' emp.id %}" method="post" style="display: inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-primary btn-sm" style="background-color: var(--success);">
+                                        <i class="fa-solid fa-arrow-rotate-left"></i> Devolver
+                                    </button>
+                                </form>
+                            {% else %}
+                                <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">Concluído</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center" style="padding: 2rem; color: var(--text-muted);">
+                            <i class="fa-solid fa-handshake-slash" style="font-size: 2rem; margin-bottom: 0.5rem; display: block; opacity: 0.5;"></i>
+                            Nenhum empréstimo cadastrado ainda.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

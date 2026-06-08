@@ -1,0 +1,56 @@
+{% extends 'circulacao/base.html' %}
+
+{% block title %}Minhas Reservas - Biblioteca{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title">
+        <h1>Reservas de Livros</h1>
+        <p>Acompanhe o status de suas solicitações de reserva.</p>
+    </div>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 80px;">ID</th>
+                    <th>Livro</th>
+                    {% if user.is_staff %}
+                        <th>Leitor</th>
+                    {% endif %}
+                    <th>Data Solicitação</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reserva in reservas %}
+                    <tr>
+                        <td><strong>#{{ reserva.id }}</strong></td>
+                        <td>{{ reserva.livro.titulo }}</td>
+                        {% if user.is_staff %}
+                            <td>{{ reserva.usuario.username }}</td>
+                        {% endif %}
+                        <td>{{ reserva.data_reserva|date:"d/m/Y" }}</td>
+                        <td>
+                            {% if reserva.ativa %}
+                                <span class="badge badge-success">Ativa</span>
+                            {% else %}
+                                <span class="badge badge-info">Finalizada</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="{% if user.is_staff %}5{% else %}4{% endif %}" class="text-center" style="padding: 2rem; color: var(--text-muted);">
+                            <i class="fa-solid fa-bookmark" style="font-size: 2rem; margin-bottom: 0.5rem; display: block; opacity: 0.5;"></i>
+                            Nenhuma reserva registrada.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

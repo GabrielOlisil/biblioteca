@@ -1,0 +1,51 @@
+{% extends 'circulacao/base.html' %}
+
+{% block title %}Autores - Biblioteca{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title">
+        <h1>Autores</h1>
+        <p>Cadastre e gerencie os autores dos livros do acervo.</p>
+    </div>
+    <a href="{% url 'autor_create' %}" class="btn btn-primary">
+        <i class="fa-solid fa-plus"></i> Novo Autor
+    </a>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 80px;">ID</th>
+                    <th>Nome</th>
+                    <th>Nacionalidade</th>
+                    <th style="width: 120px; text-align: right;">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for autor in autores %}
+                    <tr>
+                        <td><strong>#{{ autor.id }}</strong></td>
+                        <td>{{ autor.nome }}</td>
+                        <td>{{ autor.nacionalidade|default:"Não informada" }}</td>
+                        <td style="text-align: right;">
+                            <a href="{% url 'autor_update' autor.id %}" class="btn btn-secondary btn-sm">
+                                <i class="fa-solid fa-pen"></i> Editar
+                            </a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center" style="padding: 2rem; color: var(--text-muted);">
+                            <i class="fa-solid fa-circle-info" style="font-size: 2rem; margin-bottom: 0.5rem; display: block; opacity: 0.5;"></i>
+                            Nenhum autor cadastrado ainda.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

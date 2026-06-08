@@ -1,0 +1,180 @@
+{% extends 'circulacao/base.html' %}
+
+{% block title %}Painel de Controle - Biblioteca{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title">
+        <h1>Painel de Controle</h1>
+        <p>Bem-vindo ao sistema, <strong>{{ request.user.username }}</strong>! Acompanhe o status da biblioteca em tempo real.</p>
+    </div>
+    {% if user.is_staff %}
+        <a href="{% url 'relatorio_atrasados' %}" class="btn btn-primary">
+            <i class="fa-solid fa-file-pdf"></i> PDF Livros Atrasados
+        </a>
+    {% endif %}
+</div>
+
+<!-- Cards de Estatísticas -->
+<div class="grid-4 m-b-1">
+    <div class="card flex-between">
+        <div>
+            <span style="font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600;">Total de Livros</span>
+            <h2 style="font-size: 2rem; font-weight: 700; margin-top: 0.25rem;">{{ total_livros }}</h2>
+        </div>
+        <i class="fa-solid fa-book" style="font-size: 2.25rem; color: var(--primary); opacity: 0.25;"></i>
+    </div>
+
+    <div class="card flex-between">
+        <div>
+            <span style="font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600;">Autores Cadastrados</span>
+            <h2 style="font-size: 2rem; font-weight: 700; margin-top: 0.25rem;">{{ total_autores }}</h2>
+        </div>
+        <i class="fa-solid fa-pen-nib" style="font-size: 2.25rem; color: var(--secondary); opacity: 0.25;"></i>
+    </div>
+
+    <div class="card flex-between">
+        <div>
+            <span style="font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600;">Leitores Cadastrados</span>
+            <h2 style="font-size: 2rem; font-weight: 700; margin-top: 0.25rem;">{{ total_leitores }}</h2>
+        </div>
+        <i class="fa-solid fa-users" style="font-size: 2.25rem; color: var(--success); opacity: 0.25;"></i>
+    </div>
+
+    <div class="card flex-between">
+        <div>
+            <span style="font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600;">Empréstimos Ativos</span>
+            <h2 style="font-size: 2rem; font-weight: 700; margin-top: 0.25rem;">{{ emprestimos_ativos }}</h2>
+        </div>
+        <i class="fa-solid fa-clock" style="font-size: 2.25rem; color: var(--warning); opacity: 0.25;"></i>
+    </div>
+</div>
+
+<div class="grid-2">
+    <!-- Gráfico de Gêneros -->
+    <div class="card">
+        <h3 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1.25rem; color: var(--text-main);">
+            <i class="fa-solid fa-chart-column" style="color: var(--primary); margin-right: 0.5rem;"></i>
+            Gêneros Literários Mais Procurados no Mês
+        </h3>
+        <div style="position: relative; height: 320px; width: 100%; display: flex; align-items: center; justify-content: center;">
+            <canvas id="generosChart"></canvas>
+            <div id="no-data-msg" style="display: none; text-align: center; color: var(--text-muted); font-size: 0.95rem;">
+                <i class="fa-solid fa-chart-bar" style="font-size: 3rem; margin-bottom: 1rem; color: #cbd5e1;"></i>
+                <p>Nenhum empréstimo realizado neste mês ainda para gerar estatísticas de gênero.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Links / Ações Rápidas -->
+    <div class="card">
+        <h3 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1.25rem; color: var(--text-main);">
+            <i class="fa-solid fa-star" style="color: var(--warning); margin-right: 0.5rem;"></i>
+            Ações Rápidas
+        </h3>
+        
+        <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem;">
+            {% if user.is_staff %}
+                <a href="{% url 'emprestimo_create' %}" class="btn btn-primary" style="justify-content: center; width: 100%;">
+                    <i class="fa-solid fa-plus"></i> Registrar Novo Empréstimo
+                </a>
+                <a href="{% url 'livro_create' %}" class="btn btn-secondary" style="justify-content: center; width: 100%;">
+                    <i class="fa-solid fa-plus"></i> Adicionar Livro
+                </a>
+                <a href="{% url 'usuario_create' %}" class="btn btn-secondary" style="justify-content: center; width: 100%;">
+                    <i class="fa-solid fa-user-plus"></i> Cadastrar Novo Leitor
+                </a>
+            {% else %}
+                <a href="{% url 'livro_list' %}" class="btn btn-primary" style="justify-content: center; width: 100%;">
+                    <i class="fa-solid fa-magnifying-glass"></i> Consultar Catálogo de Livros
+                </a>
+                <a href="{% url 'reserva_list' %}" class="btn btn-secondary" style="justify-content: center; width: 100%;">
+                    <i class="fa-solid fa-bookmark"></i> Ver Minhas Reservas
+                </a>
+            {% endif %}
+        </div>
+
+        <!-- Livros Disponíveis (Destaque) -->
+        <h4 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--text-main); border-top: 1px solid #e2e8f0; padding-top: 1rem;">
+            Livros Disponíveis para Leitura
+        </h4>
+        <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.5rem;">
+            {% for livro in livros_destaque %}
+                <li style="font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; background-color: #f8fafc; border-radius: 6px;">
+                    <span>
+                        <strong>{{ livro.titulo }}</strong> <span style="color: var(--text-muted);">de {{ livro.autor.nome }}</span>
+                    </span>
+                    <span class="badge badge-success">Disponível</span>
+                </li>
+            {% empty %}
+                <li style="font-size: 0.9rem; color: var(--text-muted); padding: 0.5rem;">Nenhum livro disponível no momento.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<!-- Import Chart.js via CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const labels = JSON.parse('{{ chart_labels|safe }}');
+        const values = JSON.parse('{{ chart_values|safe }}');
+
+        if (labels.length === 0) {
+            document.getElementById('generosChart').style.display = 'none';
+            document.getElementById('no-data-msg').style.display = 'block';
+            return;
+        }
+
+        const ctx = document.getElementById('generosChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Empréstimos',
+                    data: values,
+                    backgroundColor: [
+                        '#6366f1', // Indigo
+                        '#0ea5e9', // Sky Blue
+                        '#10b981', // Emerald Green
+                        '#f59e0b', // Amber
+                        '#ec4899', // Pink
+                        '#8b5cf6', // Violet
+                        '#14b8a6'  // Teal
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: {
+                                family: 'Outfit',
+                                size: 12
+                            },
+                            color: '#334155'
+                        }
+                    },
+                    tooltip: {
+                        titleFont: {
+                            family: 'Outfit',
+                            size: 13
+                        },
+                        bodyFont: {
+                            family: 'Outfit',
+                            size: 13
+                        }
+                    }
+                },
+                cutout: '65%'
+            }
+        });
+    });
+</script>
+{% endblock %}
