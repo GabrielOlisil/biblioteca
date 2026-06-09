@@ -43,11 +43,28 @@
         </div>
 
         <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1.5rem; margin-bottom: 1.5rem;">
-            {{ form.disponivel }}
-            <label for="id_disponivel" style="margin-bottom: 0; cursor: pointer;">Disponível para Empréstimo e Reserva</label>
-            {% if form.disponivel.errors %}
-                <span class="helptext" style="color: var(--danger); display: block;">{{ form.disponivel.errors }}</span>
+            <label for="id_quantidade_exemplares" style="margin-bottom: 0; min-width: 220px;">Quantidade de Exemplares</label>
+            {{ form.quantidade_exemplares }}
+            {% if form.quantidade_exemplares.errors %}
+                <span class="helptext" style="color: var(--danger); display: block;">{{ form.quantidade_exemplares.errors }}</span>
             {% endif %}
+        </div>
+
+        <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem; margin-bottom: 1.5rem;">
+            {{ form.indisponivel_manual }}
+            <label for="id_indisponivel_manual" style="margin-bottom: 0; cursor: pointer;">Indisponibilizar manualmente</label>
+            {% if form.indisponivel_manual.errors %}
+                <span class="helptext" style="color: var(--danger); display: block;">{{ form.indisponivel_manual.errors }}</span>
+            {% endif %}
+            <span class="helptext">Quando marcado, o livro fica bloqueado mesmo com exemplares em estoque.</span>
+        </div>
+
+        <div class="form-group">
+            <span class="helptext">A disponibilidade final é recalculada automaticamente conforme empréstimos e reservas ativas.</span>
+        </div>
+
+        <div class="form-group" style="display: none;">
+            {{ form.disponivel }}
         </div>
 
         <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 2rem;">

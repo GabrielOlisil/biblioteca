@@ -54,8 +54,8 @@ class EmprestimoForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Permite selecionar apenas livros disponíveis
-        self.fields['livro'].queryset = Livro.objects.filter(disponivel=True)
+        # Permite selecionar apenas livros efetivamente disponíveis
+        self.fields['livro'].queryset = Livro.objects.filter(disponivel=True).order_by('titulo')
         # Permite selecionar apenas leitores comuns (não staff)
         self.fields['usuario'].queryset = User.objects.filter(is_staff=False)
 

@@ -40,8 +40,10 @@
                     </span>
                     {% if livro.disponivel %}
                         <span class="badge badge-success"><i class="fa-solid fa-check" style="margin-right: 3px;"></i> Disponível</span>
+                    {% elif livro.indisponivel_manual %}
+                        <span class="badge badge-info"><i class="fa-solid fa-lock" style="margin-right: 3px;"></i> Bloqueado manualmente</span>
                     {% else %}
-                        <span class="badge badge-danger"><i class="fa-solid fa-xmark" style="margin-right: 3px;"></i> Indisponível</span>
+                        <span class="badge badge-danger"><i class="fa-solid fa-xmark" style="margin-right: 3px;"></i> Exemplar(es) esgotado(s)</span>
                     {% endif %}
                 </div>
                 
@@ -51,6 +53,10 @@
                 
                 <p style="font-size: 0.9rem; color: var(--text-muted);">
                     <i class="fa-solid fa-user-pen" style="margin-right: 4px; font-size: 0.8rem;"></i> {{ livro.autor.nome }}
+                </p>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.35rem;">
+                    <i class="fa-solid fa-layer-group" style="margin-right: 4px; font-size: 0.8rem;"></i>
+                    {{ livro.exemplares_disponiveis }} de {{ livro.quantidade_exemplares }} exemplares disponíveis
                 </p>
             </div>
 

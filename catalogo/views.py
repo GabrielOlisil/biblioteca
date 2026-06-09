@@ -69,7 +69,7 @@ class LivroListView(LoginRequiredMixin, ListView):
 
 class LivroCreateView(BibliotecarioRequiredMixin, CreateView):
     model = Livro
-    fields = ['titulo', 'autor', 'genero', 'disponivel']
+    fields = ['titulo', 'autor', 'genero', 'quantidade_exemplares', 'indisponivel_manual']
     template_name = "catalogo/livro_form.html"
     success_url = reverse_lazy('livro_list')
 
@@ -79,7 +79,7 @@ class LivroCreateView(BibliotecarioRequiredMixin, CreateView):
 
 class LivroUpdateView(BibliotecarioRequiredMixin, UpdateView):
     model = Livro
-    fields = ['titulo', 'autor', 'genero', 'disponivel']
+    fields = ['titulo', 'autor', 'genero', 'quantidade_exemplares', 'indisponivel_manual']
     template_name = "catalogo/livro_form.html"
     success_url = reverse_lazy('livro_list')
 

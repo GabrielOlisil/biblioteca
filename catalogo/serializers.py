@@ -11,7 +11,8 @@ class LivroSerializer(serializers.ModelSerializer):
     autor_id = serializers.PrimaryKeyRelatedField(
         queryset=Autor.objects.all(), source='autor', write_only=True
     )
+    exemplares_disponiveis = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Livro
-        fields = ['id', 'titulo', 'autor', 'autor_id', 'genero', 'disponivel']
+        fields = ['id', 'titulo', 'autor', 'autor_id', 'genero', 'quantidade_exemplares', 'exemplares_disponiveis', 'indisponivel_manual', 'disponivel']

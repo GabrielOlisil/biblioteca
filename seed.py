@@ -41,17 +41,30 @@ for ad in autores_dados:
 
 # 4. Criar Livros
 livros_dados = [
-    {"titulo": "O Senhor dos Anéis", "autor": autores["J.R.R. Tolkien"], "genero": "Fantasia", "disponivel": True},
-    {"titulo": "O Hobbit", "autor": autores["J.R.R. Tolkien"], "genero": "Fantasia", "disponivel": True},
-    {"titulo": "Dom Casmurro", "autor": autores["Machado de Assis"], "genero": "Romance", "disponivel": True},
-    {"titulo": "Memórias Póstumas de Brás Cubas", "autor": autores["Machado de Assis"], "genero": "Romance", "disponivel": True},
-    {"titulo": "A Guerra dos Tronos", "autor": autores["George R.R. Martin"], "genero": "Fantasia", "disponivel": True},
-    {"titulo": "A Hora da Estrela", "autor": autores["Clarice Lispector"], "genero": "Drama", "disponivel": True}
+    {"titulo": "O Senhor dos Anéis", "autor": autores["J.R.R. Tolkien"], "genero": "Fantasia", "quantidade_exemplares": 1, "indisponivel_manual": False},
+    {"titulo": "O Hobbit", "autor": autores["J.R.R. Tolkien"], "genero": "Fantasia", "quantidade_exemplares": 2, "indisponivel_manual": False},
+    {"titulo": "Dom Casmurro", "autor": autores["Machado de Assis"], "genero": "Romance", "quantidade_exemplares": 2, "indisponivel_manual": False},
+    {"titulo": "Memórias Póstumas de Brás Cubas", "autor": autores["Machado de Assis"], "genero": "Romance", "quantidade_exemplares": 2, "indisponivel_manual": False},
+    {"titulo": "A Guerra dos Tronos", "autor": autores["George R.R. Martin"], "genero": "Fantasia", "quantidade_exemplares": 1, "indisponivel_manual": False},
+    {"titulo": "A Hora da Estrela", "autor": autores["Clarice Lispector"], "genero": "Drama", "quantidade_exemplares": 2, "indisponivel_manual": False}
 ]
 
 livros = {}
 for ld in livros_dados:
-    livro, created = Livro.objects.get_or_create(titulo=ld["titulo"], defaults={"autor": ld["autor"], "genero": ld["genero"], "disponivel": ld["disponivel"]})
+    livro, created = Livro.objects.get_or_create(
+        titulo=ld["titulo"],
+        defaults={
+            "autor": ld["autor"],
+            "genero": ld["genero"],
+            "quantidade_exemplares": ld["quantidade_exemplares"],
+            "indisponivel_manual": ld["indisponivel_manual"],
+        },
+    )
+    livro.autor = ld["autor"]
+    livro.genero = ld["genero"]
+    livro.quantidade_exemplares = ld["quantidade_exemplares"]
+    livro.indisponivel_manual = ld["indisponivel_manual"]
+    livro.save()
     livros[ld["titulo"]] = livro
     if created:
         print(f"Livro '{livro.titulo}' criado.")
@@ -70,8 +83,6 @@ emp1, created = Emprestimo.objects.get_or_create(
     }
 )
 if created:
-    livros["O Hobbit"].disponivel = True
-    livros["O Hobbit"].save()
     print("Empréstimo (devolvido em dia) criado para O Hobbit.")
 
 # Empréstimo devolvido com atraso
@@ -85,8 +96,6 @@ emp2, created = Emprestimo.objects.get_or_create(
     }
 )
 if created:
-    livros["Dom Casmurro"].disponivel = True
-    livros["Dom Casmurro"].save()
     print("Empréstimo (devolvido com atraso) criado para Dom Casmurro.")
 
 # Empréstimo ativo (livro ocupado)
@@ -100,8 +109,6 @@ emp3, created = Emprestimo.objects.get_or_create(
     }
 )
 if created:
-    livros["O Senhor dos Anéis"].disponivel = False
-    livros["O Senhor dos Anéis"].save()
     print("Empréstimo ativo criado para O Senhor dos Anéis (livro indisponível).")
 
 # Empréstimo em atraso (para aparecer no PDF!)
@@ -115,8 +122,6 @@ emp4, created = Emprestimo.objects.get_or_create(
     }
 )
 if created:
-    livros["A Guerra dos Tronos"].disponivel = False
-    livros["A Guerra dos Tronos"].save()
     print("Empréstimo atrasado criado para A Guerra dos Tronos (livro indisponível).")
 
 print("Banco de dados populado com sucesso!")

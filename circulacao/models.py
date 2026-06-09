@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from datetime import date
 
 class Emprestimo(models.Model):
@@ -19,16 +20,20 @@ class Emprestimo(models.Model):
         else:
             self.valor_multa = 0.00
         self.save()
-        
-        self.livro.disponivel = True
-        self.livro.save()
+
+        self.livro.recalcular_disponibilidade()
+
+    def delete(self, *args, **kwargs):
+        livro = self.livro
+        super().delete(*args, **kwargs)
+        livro.recalcular_disponibilidade()
 
     def save(self, *args, **kwargs):
         is_new = self.pk is None
+        if is_new and (not self.livro.disponivel or self.livro.exemplares_disponiveis <= 0):
+            raise ValidationError("Este livro não possui exemplares disponíveis para empréstimo.")
         super().save(*args, **kwargs)
-        if is_new:
-            self.livro.disponivel = False
-            self.livro.save()
+        self.livro.recalcular_disponibilidade()
 
     def __str__(self):
         return f"Empréstimo de {self.livro} para {self.usuario.username}"
@@ -39,12 +44,17 @@ class Reserva(models.Model):
     data_reserva = models.DateField(auto_now_add=True, verbose_name="Data de Reserva")
     ativa = models.BooleanField(default=True, verbose_name="Ativa")
 
+    def delete(self, *args, **kwargs):
+        livro = self.livro
+        super().delete(*args, **kwargs)
+        livro.recalcular_disponibilidade()
+
     def save(self, *args, **kwargs):
         is_new = self.pk is None
+        if is_new and self.ativa and (not self.livro.disponivel or self.livro.exemplares_disponiveis <= 0):
+            raise ValidationError("Este livro não possui exemplares disponíveis para reserva.")
         super().save(*args, **kwargs)
-        if is_new and self.ativa:
-            self.livro.disponivel = False
-            self.livro.save()
+        self.livro.recalcular_disponibilidade()
 
     def __str__(self):
         return f"Reserva de {self.livro} por {self.usuario.username}"
